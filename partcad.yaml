@@ -1,6 +1,6 @@
 name: //pub/medical/laboratory/4tvc-microlab
 desc: Microlab by Four Thieves Vinegar Collective.
-partcad: ">=0.6.33"
+partcad: ">=0.8.0"
 cover:
   assembly: microlab
 
@@ -16,7 +16,7 @@ docs:
     both PartCAD and this package, but do not yet use this package
     for manufacturing or ordering Microlab parts.*
 
-import:
+dependencies:
   pub:
     onlyInRoot: True
     type: git
