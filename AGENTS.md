@@ -48,7 +48,8 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 
 - The stir rod paddle is wider than the 6 oz inner jar and overlaps its wall.
 - The pumps box's front slot sits 2 mm higher than its side slots allow for part C's tab. C is raised 2.1 mm (H `eye-front-1`, with the stand's `core-holder`) and floats about 1.85 mm above its seat on H.
-- Inside the pumps box, the box overlaps its pumps (23–34 mm³ each), and the stir rod mount overlaps its motor (18 mm³).
+- Inside the pumps box, the box overlaps its pumps (23–34 mm³ each).
+- Inside the reactor core, the stir rod mount overlaps its motor (18 mm³).
 - `cold-unit-tube` is a remote STEP and still needs reworking as a sweep.
 
 ## Conventions
