@@ -11,8 +11,10 @@ gearbox_diameter = 10.0
 gearbox_length = 9.0
 shaft_diameter = 3.0
 shaft_length = 8.0
-wire_length = 35.0
+# Guessed: short vertical stubs from the end cap tabs, not the real leads
+wire_length = 5.0
 wire_radius = 0.8
+wire_spacing = 6.0
 
 body = (
     cq.Workplane("XY")
@@ -34,19 +36,19 @@ shaft = (
 )
 
 wire_red = (
-    cq.Workplane("YZ")
-    .center(body_width / 2 - 1.5, shaft_length + gearbox_length + body_length)
+    cq.Workplane("XY")
+    .center(wire_spacing / 2, 0)
     .circle(wire_radius)
     .extrude(wire_length)
-    .translate((0, 1.5, 0))
+    .translate((0, 0, shaft_length + gearbox_length + body_length))
 )
 
 wire_black = (
-    cq.Workplane("YZ")
-    .center(body_width / 2 - 1.5, shaft_length + gearbox_length + body_length)
+    cq.Workplane("XY")
+    .center(-wire_spacing / 2, 0)
     .circle(wire_radius)
     .extrude(wire_length)
-    .translate((0, -1.5, 0))
+    .translate((0, 0, shaft_length + gearbox_length + body_length))
 )
 
 motor = body.union(gearbox).union(shaft).union(wire_red).union(wire_black)
