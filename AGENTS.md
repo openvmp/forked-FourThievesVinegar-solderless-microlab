@@ -54,7 +54,6 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
   - The peristaltic pump's hole pattern is 37.5 x 54 mm against the box's 37.9 x 55, so its lower M3 screws cut into the hole walls. `pc test` skips these screws as invalid solids.
   - The fix belongs in the parts repo's STEP files.
 - The peristaltic pumps stand 1 mm off the box's front: their head screws stick out 1 mm behind the mounting plate.
-- Inside the reactor core, the stir rod mount overlaps its motor (18 mm³).
 - `cold-unit-tube` and `hot-unit-tube` are CadQuery approximations of the hand-bent coils; their scripts say where each value comes from.
 - `hot-unit-heater` is a single solid of about 1300 faces. Exact booleans against it can take minutes; screen with plane sections first.
 
