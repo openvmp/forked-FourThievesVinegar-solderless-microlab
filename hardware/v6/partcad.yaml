@@ -153,10 +153,10 @@ parts:
     # fileUrl: {{ url }}/control-box/control-box-lid-flat-v.1.0.step
     implements:
       "//pub/std/metric/m:m3-thru":
-        outer-left: [[-101, -47, 4], [1, 0, 0], 180]
-        outer-right: [[101, -47, 4], [1, 0, 0], 180]
-        inner-left: [[-101, -47, 0], [1, 0, 0], 0]
-        inner-right: [[101, -47, 0], [1, 0, 0], 0]
+        outer-left: [[-101, -46, 4], [1, 0, 0], 180]
+        outer-right: [[101, -46, 4], [1, 0, 0], 180]
+        inner-left: [[-101, -46, 0], [1, 0, 0], 0]
+        inner-right: [[101, -46, 0], [1, 0, 0], 0]
   control-box-flat:
     desc: Low profile control box
     type: step
