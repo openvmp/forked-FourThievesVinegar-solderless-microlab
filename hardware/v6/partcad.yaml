@@ -138,6 +138,12 @@ parts:
     ports:
       rpi: [[8, 36, 51], [-0.71, -0.71, 0], 180]
       uno: [[131.5, 39.5, 8], [0.71, 0.71, 0], 180]
+      connector-8: [[48.8, 4, 21.3], [0.71, -0.71, 0], 180]
+      connector-12: [[166, 4, 21.3], [0.71, -0.71, 0], 180]
+      connector-2: [[170.5, 96, 51], [-0.71, -0.71, 0], 180]
+      usb-upper: [[108, 4, 26], [0.71, -0.71, 0], 180]
+      usb-lower: [[108, 4, 14], [0.71, -0.71, 0], 180]
+      barrel-jack: [[196, 96, 55], [-0.71, -0.71, 0], 180]
   control-box-lid:
     desc: Control box lid for regular size control box
     type: step
@@ -165,6 +171,15 @@ parts:
     ports:
       rpi: [[8, 22.5, 20], [-0.71, -0.71, 0], 180]
       uno: [[179.5, 92, 8], [0, 1, 0], 180]
+      relay-case: [[61.9, 161.6, 4], [0.71, -0.71, 0], 180]
+      stepdown-case: [[177.5, 43.5, 4], [0.71, -0.71, 0], 180]
+      wire-connector: [[84.4, 146.9, 4], [-0.71, -0.71, 0], 180]
+      connector-8: [[31.3, 184, 28.3], [-0.71, -0.71, 0], 180]
+      connector-12: [[148.5, 184, 28.3], [-0.71, -0.71, 0], 180]
+      connector-2: [[4, 132, 29], [0, 1, 0], 180]
+      usb-upper: [[86.5, 184, 33], [-0.71, -0.71, 0], 180]
+      usb-lower: [[86.5, 184, 21], [-0.71, -0.71, 0], 180]
+      barrel-jack: [[4, 155.5, 33], [0, 1, 0], 180]
   control-box-lid-flat:
     desc: Control box lid for low profile control box
     type: step
@@ -181,6 +196,12 @@ parts:
     type: step
     fileFrom: url
     fileUrl: {{ url }}/control-box/sub-components/relay-board-case-50x73x17mm-no-top.step
+    implements:
+      "//pub/std/metric/m:m3-thru":
+        tab-top: [[6, -4.5, 10], [1, 0, 0], 180]
+        tab-bottom: [[6, -4.5, 0], [1, 0, 0], 0]
+    ports:
+      board: [[0, 0, 0], [0, 0, 1], 0]
   relay-case:
     desc: Relay board case with a top cover
     type: step
@@ -191,7 +212,91 @@ parts:
     type: step
     fileFrom: url
     fileUrl: {{ url }}/control-box/sub-components/stepdown-case-63x27x14mm.step
-  
+    ports:
+      board: [[0, 0, 0], [0, 0, 1], 0]
+  relay-board:
+    # TODO: add a purchase definition (CU-RLY)
+    desc: 4-channel 5V relay board (approximation, see script)
+    type: cadquery
+    path: parts/relay-board-4ch.py
+    manufacturable: false
+    ports:
+      case: [[0, 0, 0], [-0.71, -0.71, 0], 180]
+  stepdown-converter:
+    # TODO: add a purchase definition (CU-SDC)
+    desc: 12V to 5V stepdown converter with USB output (approximation, see script)
+    type: cadquery
+    path: parts/stepdown-converter.py
+    manufacturable: false
+    ports:
+      case: [[0, 0, 0], [-0.71, -0.71, 0], 180]
+  cnc-shield:
+    # TODO: add a purchase definition (CU-CNC, CU-SMD)
+    desc: Arduino CNC shield v3 with three stepper drivers (approximation, see script)
+    type: cadquery
+    path: parts/cnc-shield.py
+    manufacturable: false
+    ports:
+      uno: [[-33, -26, 0], [-0.71, -0.71, 0], 180]
+  rpi-lcd-35:
+    # TODO: add a purchase definition (CU-SCR)
+    desc: 3.5 inch GPIO touchscreen for the Raspberry Pi (approximation, see script)
+    type: cadquery
+    path: parts/rpi-lcd-35.py
+    manufacturable: false
+    ports:
+      rpi: [[0, 0, 0], [-0.71, -0.71, 0], 180]
+  lever-connector:
+    # TODO: add a purchase definition (CU-WCL)
+    desc: Lever wire connector, 2-in-6-out (approximation, see script)
+    type: cadquery
+    path: parts/lever-connector-2x6.py
+    manufacturable: false
+    ports:
+      floor: [[0, 0, 0], [0, 0, 1], 0]
+  {% for pins, width, height, spacing, dz in [[12, 57, 12.5, 62.5, 4.85], [8, 41.5, 12.5, 47, 4.85], [2, 13, 8, 20, 11.5]] %}
+  panel-connector-{{ pins }}:
+    # TODO: add a purchase definition (SP-PC{{ pins }})
+    desc: {{ pins }}-pin panel-mount terminal block (approximation, see script)
+    type: cadquery
+    path: parts/panel-terminal-block.py
+    manufacturable: false
+    parameters:
+      pins:
+        type: int
+        default: {{ pins }}
+      window_width:
+        type: float
+        default: {{ width }}
+      window_height:
+        type: float
+        default: {{ height }}
+      hole_spacing:
+        type: float
+        default: {{ spacing }}
+      hole_height:
+        type: float
+        default: {{ dz }}
+    ports:
+      wall: [[0, 0, 0], [0, 0, 1], 0]
+  {% endfor %}
+  usb-panel-socket:
+    # TODO: add a purchase definition (CU-USB)
+    desc: Panel-mount USB-A extension socket (approximation, see script)
+    type: cadquery
+    path: parts/usb-panel-socket.py
+    manufacturable: false
+    ports:
+      wall: [[0, 0, 0], [0, 0, 1], 0]
+  barrel-jack:
+    # TODO: add a purchase definition (CU-PLG)
+    desc: Panel-mount 5.5 x 2.1 mm DC barrel jack (approximation, see script)
+    type: cadquery
+    path: parts/barrel-jack-panel.py
+    manufacturable: false
+    ports:
+      wall: [[0, 0, 0], [0, 0, 1], 0]
+
   # -------- Reactor Unit --------
 
   # Pumps box
