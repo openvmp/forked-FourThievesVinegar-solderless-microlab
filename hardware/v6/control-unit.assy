@@ -28,6 +28,91 @@ links:
       # slide: [0, 10, 0]
       # slideSecondary: [0, 0, 50]
 
+  - part: cnc-shield
+    name: cnc-shield
+    connectPorts:
+      with: uno
+      name: unoR3
+      to: corner-bottom-back-left
+
+  - part: rpi-lcd-35
+    name: screen
+    connectPorts:
+      with: rpi
+      name: rpi
+      to: corner-bottom-front-left
+
+{% if param_profile == 'flat' %}
+  - part: relay-case-no-top
+    name: relay-case
+    connectPorts:
+      with: board
+      name: box
+      to: relay-case
+
+  - part: relay-board
+    name: relay-board
+    connectPorts:
+      with: case
+      name: relay-case
+      to: board
+
+  - part: //pub/std/metric/cqwarehouse:fastener/raisedcheesehead-iso7045
+    name: relay-case-screw
+    params:
+      size: M3-0.5
+      length: 12
+    connect:
+      toInstance: tab-top
+      name: relay-case
+
+  - part: stepdown-case
+    name: stepdown-case
+    connectPorts:
+      with: board
+      name: box
+      to: stepdown-case
+
+  - part: stepdown-converter
+    name: stepdown-converter
+    connectPorts:
+      with: case
+      name: stepdown-case
+      to: board
+
+  - part: lever-connector
+    name: wire-connector
+    connectPorts:
+      with: floor
+      name: box
+      to: wire-connector
+{% endif %}
+
+{% for pins in [8, 12, 2] %}
+  - part: panel-connector-{{ pins }}
+    name: connector-{{ pins }}
+    connectPorts:
+      with: wall
+      name: box
+      to: connector-{{ pins }}
+{% endfor %}
+
+{% for port in ['usb-upper', 'usb-lower'] %}
+  - part: usb-panel-socket
+    name: {{ port }}
+    connectPorts:
+      with: wall
+      name: box
+      to: {{ port }}
+{% endfor %}
+
+  - part: barrel-jack
+    name: barrel-jack
+    connectPorts:
+      with: wall
+      name: box
+      to: barrel-jack
+
   - part: control-box-lid{{ profile_prefix }}
     name: lid
     connect:
