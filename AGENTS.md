@@ -13,7 +13,7 @@ Notes for agents and contributors working on the PartCAD model of the MicroLab.
 
 Run `pc` from the repository root. From `hardware/v6` the `urls.j2` import fails.
 
-- Parts: `pc test v6:<part>`, `pc render -t png -O <dir> v6:<part>`.
+- Parts: `pc qual test v6:<part>`, `pc render -t png -O <dir> v6:<part>`.
 - A PartCAD without partcad/partcad#828 needs `--assembly` (`-a`) for an assembly: `pc test --assembly v6:<assembly>`, `pc export -a -t step -O <dir> v6:<assembly>`, or it says "not found". With it, the kind is found by name and the flag is optional. `pc render` does not work for assemblies here.
 - `pc` keeps a daemon (`partcad_service_json_rpc`, started from the miniconda Python) that holds built shapes in memory. If an export still shows a part as it was before you edited its script, stop that process and export again.
 - Parameters in `partcad.yaml` reach CadQuery scripts only with partcad's CQGI fix for Python 3.14 (branch `fix/cqgi-parameters-python-3.14`). Without it every script builds with its own defaults, so the three `panel-connector-*` parts all come out as the 8-pin one.
@@ -33,7 +33,7 @@ Check cheapest first, with `hardware/tools/check_overlaps.py` (needs a Python wi
 
 1. Bounding-box screen of every part pair on a STEP export, in seconds.
 2. Exact overlap volumes for the pairs involving the parts you changed: `--parts <tree paths>`. Do this after every edit.
-3. Before committing: `--full`, which measures all candidate pairs and runs `pc test --assembly -f interference`.
+3. Before committing: `--full`, which measures all candidate pairs and runs `pc qual test --assembly -f interference`.
 
 The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/16`), in the order of the `.assy` links. Use `--list` to identify them.
 
@@ -54,7 +54,7 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 - The pumps box's front slot sits 2 mm higher than its side slots allow for part C's tab. C is raised 2.1 mm (H `eye-front-1`, with the stand's `core-holder`) and floats about 1.85 mm above its seat on H.
 - The pump models (`peristaltic-pump.step`, `circulation-pump.step`) disagree with the pumps box, which is the built 4TV design:
   - The circulation pump's barrel is 27.2 mm across in the box's 27.0 mm hole (34 mm³ each).
-  - The peristaltic pump's hole pattern is 37.5 x 54 mm against the box's 37.9 x 55, so its lower M3 screws cut into the hole walls. `pc test` skips these screws as invalid solids.
+  - The peristaltic pump's hole pattern is 37.5 x 54 mm against the box's 37.9 x 55, so its lower M3 screws cut into the hole walls. `pc qual test` skips these screws as invalid solids.
   - The fix belongs in the parts repo's STEP files.
 - The peristaltic pumps stand 1 mm off the box's front: their head screws stick out 1 mm behind the mounting plate.
 - The control box holds the Pi by four corner posts with catches, built for the Pi 3 Model B the docs call for (`CU-RPI`). The model uses `rpi4b`, the only Pi in the PartCAD index. The Pi 4's front USB stack sticks out 3 mm past the board edge, but the post's inner face is only 1.5 mm past it, so they overlap by 10 mm³. The Pi can't shift to clear it. Whether a real Pi 3's Ethernet jack in that corner clears the post is unmeasured.

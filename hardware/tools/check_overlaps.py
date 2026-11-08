@@ -4,7 +4,7 @@
    Pairs whose boxes don't meet can't overlap.
 2. Measure exact overlap volumes for the candidate pairs that involve --parts.
 3. With --full: measure all candidate pairs, then run
-   `pc test --assembly -f interference` as the final gate.
+   `pc qual test --assembly -f interference` as the final gate.
 
 Run it with a Python that has CadQuery's OCP, from anywhere in the repo:
 
@@ -105,7 +105,7 @@ def main():
     parser.add_argument("--package", default="v6", help="PartCAD package (default: v6)")
     parser.add_argument("--step", help="use an existing STEP export instead of exporting")
     parser.add_argument("--parts", nargs="+", default=[], help="tree paths to check exactly, e.g. 1/3/16")
-    parser.add_argument("--full", action="store_true", help="check all candidate pairs and run pc test")
+    parser.add_argument("--full", action="store_true", help="check all candidate pairs and run pc qual test")
     parser.add_argument("--list", action="store_true", help="print every part's bounding box")
     parser.add_argument("--min-volume", type=float, default=DEFAULT_MIN_VOLUME, help="mm^3 below which an overlap is noise")
     parser.add_argument("--pc", default="pc", help="PartCAD command (default: pc)")
@@ -143,9 +143,9 @@ def main():
 
     status = 1 if found else 0
     if args.full:
-        print("tier 3: pc test --assembly -f interference %s:%s" % (args.package, args.assembly))
+        print("tier 3: pc qual test --assembly -f interference %s:%s" % (args.package, args.assembly))
         test = subprocess.run(
-            [args.pc, "--no-ansi", "test", "--assembly", "-f", "interference", f"{args.package}:{args.assembly}"],
+            [args.pc, "--no-ansi", "qual", "test", "--assembly", "-f", "interference", f"{args.package}:{args.assembly}"],
             cwd=REPO_ROOT,
         )
         status = status or test.returncode
