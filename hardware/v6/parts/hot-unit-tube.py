@@ -7,11 +7,15 @@ to the other lid hole.
 
 - Tube: 1/4 in OD x 3/16 in ID, from the parts list.
 - Frame: the lid's. The holes are at x = +-24 mm, the lid's top face is z = 0
-  and the jar is towards +z; its inside bottom is at z = 236.
-- The immersion heater (hot-unit-heater) hangs from the lid's pocket down to
-  z = 121. The down-leg drops straight from its hole past it, and the coil
-  (44 mm radius) winds below it, from z = 130, about 14 mm from the heater
-  and 6 mm from the jar.
+  and the jar is towards +z. The jar is the 32 oz one from the parts list
+  (TC-JAR); its inside bottom is at z = 166.
+- The immersion heater (hot-unit-heater) hangs from the lid's pocket with its
+  element turned toward the jar axis, so it stays within 17.1 mm of the axis.
+  The docs ask to "leave space for the heating coil".
+- coil_radius, turns, coil_top, coil_bottom: as the cooling coil. 30 mm passes
+  the jar's 74 mm mouth.
+- leg_x: the down-leg runs between the heater and the coil, 22 mm from the
+  axis (about 7 mm from the heater, 1.6 mm from the coil).
 - turns must be a whole number plus a half so that the coil ends under the
   second hole. Other values are guesses.
 """
@@ -27,12 +31,11 @@ tube_id = 4.7625
 hole_x = 24.0
 stick_out = 40.0
 bend_z = 15.0
-coil_radius = 44.0
-turns = 5.5
-coil_top = 130.0
-coil_bottom = 222.0
-# Distance of the down-leg from the axis inside the coil.
-leg_x = 24.0
+coil_radius = 30.0
+turns = 8.5
+coil_top = 40.0
+coil_bottom = 155.0
+leg_x = 22.0
 
 down = cq.Vector(0, 0, 1)
 up = cq.Vector(0, 0, -1)
@@ -77,7 +80,8 @@ edges = [
     (cq.Edge.makeLine(leg_top, leg_bend), False),
     (bend(leg_bend, down, inner_top, down, 12), False),
     (cq.Edge.makeLine(inner_top, inner_bottom), False),
-    (bend(inner_bottom, down, helix.startPoint(), helix.tangentAt(0), 15), False),
+    # A longer bend here makes the sweep fail.
+    (bend(inner_bottom, down, helix.startPoint(), helix.tangentAt(0), 10), False),
     (helix, True),
     (bend(helix.endPoint(), helix.tangentAt(1), riser_bend, up, 15), False),
     (cq.Edge.makeLine(riser_bend, riser_top), False),

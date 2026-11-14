@@ -580,10 +580,10 @@ parts:
   hot-unit-jar:
     desc: Jar for heating unit
     type: cadquery
-    path: parts/mason-jar-64oz-wide-mouth.py
+    path: parts/mason-jar-32oz-wide-mouth.py
     implements:
       "m74-jar-mouth":
-        mouth: [[0, 0, 235], [1, 0, 0], 180]
+        mouth: [[0, 0, 165], [1, 0, 0], 180]
   hot-unit-jar-band:
     desc: Jar band for heating unit
     type: cadquery
@@ -600,7 +600,7 @@ parts:
         left-outer: [[-24, 0, 0], [1, 0, 0], 0]
         right-outer: [[24, 0, 0], [1, 0, 0], 0]
         # TODO: should be another (rectangular) one
-        center: [[0.5, 11.1, 10.9], [0, 0, 1], 90]
+        center: [[-0.5, 11.1, 10.9], [0, 0, 1], 90]
       "m74-jar-closing":
         bottom: [[0, 0, 4], [1, 0, 0], 180]
   hot-unit-tube:
@@ -619,9 +619,8 @@ parts:
     fileFrom: url
     fileUrl: {{ url }}/temperature-units/immersion-heater.step
     implements:
-      # Rotation 0 instead of 180: the heater is mounted turned 180 degrees
-      # about Z, as the turnZ on its connect used to do.
-      "/pub/std/metric/m:m10-shaft": [[12, 0, 0], [0, 0, 1], 0]
+      # Element turned toward the jar axis, away from the wall.
+      "/pub/std/metric/m:m10-shaft": [[12, 0, 0], [0, 0, 1], 180]
 
 assemblies:
   microlab:

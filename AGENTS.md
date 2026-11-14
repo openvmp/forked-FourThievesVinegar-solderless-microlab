@@ -45,7 +45,7 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 ## Design constraints
 
 - Reactor core: the outer jar is upright, with its rim against the manifold lid's underside and its band resting on the upper neck flange. The two neck flanges clamp the stand's C-part (8 mm thick). The inner jar hangs from its band under the manifold core.
-- `parts/mason-jar-32oz-wide-mouth.py` is shared by the reactor core's outer jar and the cooling unit's jar.
+- `parts/mason-jar-32oz-wide-mouth.py` is shared by the reactor core's outer jar and the cooling and heating units' jars (`TC-JAR` is 32 oz).
 - Stir paddle: it must not touch the inner jar's bottom or sides (`docs/assembly-reactor-unit.md`). Its `paddle_length` and `shaft_length` are part parameters; the builder cuts the real shaft to fit.
 
 ## Known issues
