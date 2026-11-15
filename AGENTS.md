@@ -37,6 +37,15 @@ Check cheapest first, with `hardware/tools/check_overlaps.py` (needs a Python wi
 
 The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/16`), in the order of the `.assy` links. Use `--list` to identify them.
 
+## Tubes
+
+The routes of the `tube-*` parts are the `tubes` list in `hardware/v6/partcad.yaml`. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery):
+
+1. With no arguments: each tube's length, tightest bend and gaps to the other tubes, in seconds. Do this after every route edit. Keep bends at or above the tube's diameter.
+2. `--step <microlab export> --cache <dir>`: exact overlaps with the parts near each tube's path. `--move 1/2=dx,dy,dz` tries a new unit position without another export. An overlap with a peristaltic pump takes about 8 minutes to measure, so run tubes in separate processes with `--only`.
+
+Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_features.py` lists a STEP file's cylinders and faces, to find nozzles and holes.
+
 ## Sweeps
 
 - A `type: sweep` part sweeps a sketch along one Bezier curve built from its `axis` points, starting at the sketch origin. More points raise the curve's degree; they don't add separate sections, so a sweep can't have exactly straight segments joined to an arc.
@@ -63,6 +72,9 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 - The relay case, the converter case and the lever connector are placed only in the flat box, the one the build guide describes. The regular box's floor holes fit none of them.
 - The docs screw the converter case to the flat box's floor, but the box has no hole there, so the case rests unscrewed. The lever connector's two screws are left out: 12 mm M3 screws through its (guessed) 3 mm ears would come out under the floor.
 - `cold-unit-tube` and `hot-unit-tube` are CadQuery approximations of the hand-bent coils; their scripts say where each value comes from.
+- The `tube-*` parts (`parts/silicone-tube.py`) are approximations of flexible tubing. Each route is a list of points in the `microlab` assembly's frame, drawn for the unit positions in `microlab.assy`; moving a unit means redrawing its tubes. The circulation tubes match the docs' 16 in and 8 in lengths. The reagent tubes' lengths are guessed, and they butt against the peristaltic pump model's own tube stubs with no connector.
+- The circulation pump model's two nozzles sit front and back, where the docs say top and bottom. Turning the pump would push its ears through the box's front wall. The front nozzle goes to the manifold, the back one to the coil.
+- The circulation tubes end 45 mm below the manifold lid's top. Straight down from the lid's holes they would meet the inner jar's band, so "a couple inches below the liquid's surface" is not modelled.
 - `hot-unit-heater` is a single solid of about 1300 faces. Exact booleans against it can take minutes; screen with plane sections first.
 
 ## Conventions
