@@ -3,10 +3,22 @@ links:
     name: control-unit
   - assembly: heating-unit
     name: heating-unit
-    location: [[500, -100, 235], [0, 1, 0], 180]
+    location: [[225, 250, 169], [0, 1, 0], 180]
   - assembly: cooling-unit
     name: cooling-unit
-    location: [[300, -100, 165], [0, 1, 0], 180]
+    location: [[571, 250, 169], [0, 1, 0], 180]
   - assembly: reactor-unit
     name: reactor-unit
     location: [[300, 100, 0], [1, 0, 0], 0]
+
+  {% for unit in ['heat', 'cool'] %}
+  {% for tube in ['pump-to-core', 'pump-to-coil', 'coil-to-core'] %}
+  - part: tube-{{ unit }}-{{ tube }}
+    name: tube-{{ unit }}-{{ tube }}
+  {% endfor %}
+  {% endfor %}
+
+  {% for pump in ['x', 'y', 'z'] %}
+  - part: tube-reagent-pump-{{ pump }}
+    name: tube-reagent-pump-{{ pump }}
+  {% endfor %}
