@@ -36,11 +36,8 @@ import cadquery as cq
 from cadquery import cqgi
 from OCP.BRep import BRep_Builder
 from OCP.BRepAdaptor import BRepAdaptor_Curve
-from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
-from OCP.BRepGProp import BRepGProp
 from OCP.BRepLProp import BRepLProp_CLProps
 from OCP.BRepTools import BRepTools
-from OCP.GProp import GProp_GProps
 from OCP.gp import gp_Trsf, gp_Vec
 from OCP.TopLoc import TopLoc_Location
 from OCP.TopoDS import TopoDS_Shape
@@ -121,15 +118,6 @@ def load_parts(step, cache):
     return parts
 
 
-def overlap(a, b):
-    common = BRepAlgoAPI_Common(a, b)
-    if not common.IsDone():
-        return -1.0
-    props = GProp_GProps()
-    BRepGProp.VolumeProperties_s(common.Shape(), props)
-    return props.Mass()
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--step", help="STEP export of the microlab assembly")
@@ -203,7 +191,7 @@ def main():
         print("%s: %d parts near its path" % (name, len(near)), flush=True)
         for key in near:
             started = time.time()
-            volume = overlap(tube, parts[key])
+            volume = check_overlaps.overlap_volume(tube, parts[key])
             bad = volume < 0 or volume > MIN_VOLUME
             print("   %-10s %s %8.2f mm^3 (%.0f s)" % (key, "OVERLAP" if bad else "ok", volume, time.time() - started), flush=True)
             status = status or int(bad)

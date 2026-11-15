@@ -34,12 +34,15 @@ from OCP.TCollection import TCollection_ExtendedString
 from OCP.TDF import TDF_Label, TDF_LabelSequence
 from OCP.TDocStd import TDocStd_Document
 from OCP.TopLoc import TopLoc_Location
+from OCP.TopTools import TopTools_ListOfShape
 from OCP.XCAFDoc import XCAFDoc_DocumentTool
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # PartCAD's interference test uses the same floor to absorb boolean noise.
 DEFAULT_MIN_VOLUME = 0.05
+# mm; the smallest value that found the overlaps pc qual test reports.
+FUZZY = 0.001
 
 
 def export_step(pc, package, assembly, out_dir):
@@ -90,8 +93,23 @@ def boxes_meet(a, b):
 
 
 def overlap_volume(a, b):
+    """Volume two shapes share, or -1 if the boolean fails.
+
+    Without a fuzzy value OCC can return an empty result for a real overlap
+    (a threaded screw off-centre in a hole), which reads as no overlap.
+    """
+    first, second = TopTools_ListOfShape(), TopTools_ListOfShape()
+    first.Append(a)
+    second.Append(b)
+    common = BRepAlgoAPI_Common()
+    common.SetArguments(first)
+    common.SetTools(second)
+    common.SetFuzzyValue(FUZZY)
+    common.Build()
+    if not common.IsDone():
+        return -1.0
     props = GProp_GProps()
-    BRepGProp.VolumeProperties_s(BRepAlgoAPI_Common(a, b).Shape(), props)
+    BRepGProp.VolumeProperties_s(common.Shape(), props)
     return props.Mass()
 
 
@@ -136,7 +154,10 @@ def main():
     found = 0
     for a, b in pairs:
         volume = overlap_volume(parts[a], parts[b])
-        if volume > args.min_volume:
+        if volume < 0:
+            found += 1
+            print("  FAILED  %s x %s: the boolean did not finish" % (a, b), flush=True)
+        elif volume > args.min_volume:
             found += 1
             print("  overlap %s x %s: %.2f mm^3" % (a, b, volume), flush=True)
     print("  %d overlapping pairs" % found)

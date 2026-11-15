@@ -496,9 +496,9 @@ parts:
       "m13-opening":
         motor-seat: [[80.5, 117, 517.5], [1, 0, 0], 180]
       "//pub/std/metric/m:m3-hole-20":
-        upper-back: [[67.85, 116.85, 469], [1, 0, 0], 180]
-        upper-left: [[86.7, 128, 469], [1, 0, 0], 180]
-        upper-right: [[86.95, 106.15, 469], [1, 0, 0], 180]
+        upper-back: [[67.85, 116.85, 469.5], [1, 0, 0], 180]
+        upper-left: [[86.7, 128, 469.5], [1, 0, 0], 180]
+        upper-right: [[86.95, 106.15, 469.5], [1, 0, 0], 180]
         bottom-back: [[67.85, 116.85, 459], [1, 0, 0], 0]
         bottom-left: [[86.7, 128, 459], [1, 0, 0], 0]
         bottom-right: [[86.95, 106.15, 459], [1, 0, 0], 0]
@@ -685,7 +685,7 @@ assemblies:
         type: string
         desc: Type of the screws attaching lid to the pumps box
         enum: [raisedcountersunkovalhead-iso7047, raisedcheesehead-iso7045]
-        default: raisedcountersunkovalhead-iso7047
+        default: raisedcheesehead-iso7045
     implements:
       "m46-opening":
         opening: [[94, 0, 26], [1, 1, -1], 120]

@@ -35,6 +35,8 @@ Check cheapest first, with `hardware/tools/check_overlaps.py` (needs a Python wi
 2. Exact overlap volumes for the pairs involving the parts you changed: `--parts <tree paths>`. Do this after every edit.
 3. Before committing: `--full`, which measures all candidate pairs and runs `pc qual test --assembly -f interference`.
 
+The scripts measure overlaps with a fuzzy value of 0.001 mm. Without it OCC returned an empty result for the stir rod mount's screws against the manifold core, where `pc qual test` finds 3.6 and 4.1 mm³. If the two ever disagree, `pc qual test` is the reference.
+
 The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/16`), in the order of the `.assy` links. Use `--list` to identify them.
 
 ## Tubes
@@ -73,8 +75,10 @@ Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_
 - The docs screw the converter case to the flat box's floor, but the box has no hole there, so the case rests unscrewed. The lever connector's two screws are left out: 12 mm M3 screws through its (guessed) 3 mm ears would come out under the floor.
 - `cold-unit-tube` and `hot-unit-tube` are CadQuery approximations of the hand-bent coils; their scripts say where each value comes from.
 - The `tube-*` parts (`parts/silicone-tube.py`) are approximations of flexible tubing. Each route is a list of points in the `microlab` assembly's frame, drawn for the unit positions in `microlab.assy`; moving a unit means redrawing its tubes. The circulation tubes match the docs' 16 in and 8 in lengths. The reagent tubes' lengths are guessed, and they butt against the peristaltic pump model's own tube stubs with no connector.
-- The circulation pump model's two nozzles sit front and back, where the docs say top and bottom. Turning the pump would push its ears through the box's front wall. The front nozzle goes to the manifold, the back one to the coil.
+- The circulation pump model's two nozzles sit front and back. The docs and the photo `docs/media/pumps-unit/pumps-unit-complete-rear.jpg` have them top and bottom. Turning the model would push its ears through the box's front wall, so the model is at fault. The front nozzle goes to the manifold, the back one to the coil.
+- The stir rod mount's left and right screw holes sit about 0.7 mm off the manifold core's, so those two screws cut the core's hole walls (3.6 and 4.1 mm³). The mount is placed by its back hole, which lines up. The fix belongs in the parts repo's STEP files.
 - The circulation tubes end 45 mm below the manifold lid's top. Straight down from the lid's holes they would meet the inner jar's band, so "a couple inches below the liquid's surface" is not modelled.
+- The stir rod mount's screw holes are 3.0 mm across, the same as the M3 thread (the lid's and core's are 3.2 mm), so each of its three screws overlaps it by 3.7 to 4.0 mm³ along the thread. The fix belongs in the parts repo's STEP file.
 - `hot-unit-heater` is a single solid of about 1300 faces. Exact booleans against it can take minutes; screen with plane sections first.
 
 ## Conventions
