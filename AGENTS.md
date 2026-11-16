@@ -35,7 +35,9 @@ Check cheapest first, with `hardware/tools/check_overlaps.py` (needs a Python wi
 2. Exact overlap volumes for the pairs involving the parts you changed: `--parts <tree paths>`. Do this after every edit.
 3. Before committing: `--full`, which measures all candidate pairs and runs `pc qual test --assembly -f interference`.
 
-The scripts measure overlaps with a fuzzy value of 0.001 mm. Without it OCC returned an empty result for the stir rod mount's screws against the manifold core, where `pc qual test` finds 3.6 and 4.1 mm³. If the two ever disagree, `pc qual test` is the reference.
+`check_overlaps.py` records each pair's time and volume in `hardware/tools/.timings/<assembly>.json` (not committed). `--slowest` lists the slowest recorded pairs; `--skip-slower 60` leaves out pairs that took over 60 s last time and lists them with their last volume. A pair whose part changed is measured again. Don't skip pairs before a commit that touches them.
+
+The scripts measure overlaps with a fuzzy value of 0.001 mm. Without it OCC returned an empty result for the stir rod mount's screws against the manifold core, where `pc qual test` finds 3.6 and 4.1 mm³. Where the fuzzy boolean comes out with a negative volume (faces that touch, such as the reactor core's outer jar on its lower flange), they use the plain one. If the scripts and `pc qual test` ever disagree, `pc qual test` is the reference.
 
 The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/16`), in the order of the `.assy` links. Use `--list` to identify them.
 
