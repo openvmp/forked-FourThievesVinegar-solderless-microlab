@@ -60,7 +60,7 @@ Other options:
 
 1. Not taken: the route as `params:` on its `.assy` link. It would sit next to the parts it joins, but still be written by hand, and `check_tubes.py` reads only the defaults in `partcad.yaml`.
 2. Follow-up: a routing tool in `hardware/tools/`. It would read an export, find the two ports a route joins, draw a route between them that keeps clear of nearby parts (with `check_tubes.py`'s checks), and write the points back into `partcad.yaml`. It would cover all the tubes, so moving a unit means re-running it.
-3. Follow-up, upstream: a routed part type in PartCAD, built after placement from two connected ports (a second build pass). Only this would let a cable follow both of its ends. It belongs in PartCAD as a feature request.
+3. Follow-up, upstream: a routed part type in PartCAD, built after placement from two connected ports (a second build pass). Only this would let a cable follow both of its ends. Proposed upstream as partcad/partcad#975.
 
 ## Sweeps
 
