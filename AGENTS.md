@@ -43,7 +43,7 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 
 ## Tubes
 
-The routes of the `tube-*` parts are the `tubes` list in `hardware/v6/partcad.yaml`. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery):
+The routes of the `tube-*` parts and the `thermistor-cable` are the `tubes` list in `hardware/v6/partcad.yaml`: part name, parts list ID, outer and inner diameter (0 for a solid cable), sleeve lengths, points. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery):
 
 1. With no arguments: each tube's length, tightest bend and gaps to the other tubes, in seconds. Do this after every route edit. Keep bends at or above the tube's diameter.
 2. `--step <microlab export> --cache <dir>`: exact overlaps with the parts near each tube's path. `--move 1/2=dx,dy,dz` tries a new unit position without another export. An overlap with a peristaltic pump takes about 8 minutes to measure, so run tubes in separate processes with `--only`.
@@ -77,6 +77,7 @@ Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_
 - The docs screw the converter case to the flat box's floor, but the box has no hole there, so the case rests unscrewed. The lever connector's two screws are left out: 12 mm M3 screws through its (guessed) 3 mm ears would come out under the floor.
 - `cold-unit-tube` and `hot-unit-tube` are CadQuery approximations of the hand-bent coils; their scripts say where each value comes from.
 - The `tube-*` parts (`parts/silicone-tube.py`) are approximations of flexible tubing. Each route is a list of points in the `microlab` assembly's frame, drawn for the unit positions in `microlab.assy`; moving a unit means redrawing its tubes. The circulation tubes match the docs' 16 in and 8 in lengths. The reagent tubes' lengths are guessed, and they butt against the peristaltic pump model's own tube stubs with no connector.
+- The thermistor (`thermistor-probe`, `thermistor-cable`, `thermistor-dongle`) is an approximation; the parts list names no model. The probe is a 6 x 50 mm sleeve, the cable 3.5 mm, the dongle 18 x 9 x 40 mm, all guessed from typical USB DS18B20 listings. Only the manifold core's holes reach the inner jar, so the cable shares the back hole with `tube-reagent-pump-y`: 8 mm tube, 3.5 mm cable and 0.3 mm between them in the 12 mm hole. A 4 mm cable would not fit. That tube ends at the core's underside so the sleeve can hang beside it, tip 6.6 mm above the stir paddle's blades. The dongle's plug is left out because `usb-panel-socket` is a solid block.
 - The circulation pump model's two nozzles sit front and back. The docs and the photo `docs/media/pumps-unit/pumps-unit-complete-rear.jpg` have them top and bottom. Turning the model would push its ears through the box's front wall, so the model is at fault. The front nozzle goes to the manifold, the back one to the coil.
 - The stir rod mount's left and right screw holes sit about 0.7 mm off the manifold core's, so those two screws cut the core's hole walls (3.6 and 4.1 mm³). The mount is placed by its back hole, which lines up. The fix belongs in the parts repo's STEP files.
 - The circulation tubes end 45 mm below the manifold lid's top. Straight down from the lid's holes they would meet the inner jar's band, so "a couple inches below the liquid's surface" is not modelled.

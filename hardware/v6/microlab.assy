@@ -22,3 +22,12 @@ links:
   - part: tube-reagent-pump-{{ pump }}
     name: tube-reagent-pump-{{ pump }}
   {% endfor %}
+
+  - part: thermistor-probe
+    name: thermistor-probe
+    location: [[398, 141.2, 123], [0, 0, 1], 0]
+  - part: thermistor-cable
+    name: thermistor-cable
+  - part: thermistor-dongle
+    name: thermistor-dongle
+    location: [[86.5, 188, 21], [0, 0, 1], 0]

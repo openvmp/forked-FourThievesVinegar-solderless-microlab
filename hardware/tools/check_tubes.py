@@ -1,4 +1,4 @@
-"""Check the routes of the tube-* parts: length, bends, gaps and overlaps.
+"""Check the routed parts (tubes, thermistor cable): length, bends, gaps, overlaps.
 
 The routes are read from the `tubes` list in hardware/v6/partcad.yaml, so edit
 them there and run this again. Needs a Python with CadQuery.
@@ -16,7 +16,7 @@ them there and run this again. Needs a Python with CadQuery.
         Shift the parts under a tree path first, to try a new unit position
         without exporting again.
 
-    ... --only heat-pump-to-coil
+    ... --only tube-heat-pump-to-coil
         Check some tubes only. An overlap with a peristaltic pump takes about
         8 minutes to measure, so run tubes in separate processes.
 
@@ -47,18 +47,18 @@ import check_overlaps  # noqa: E402
 
 V6 = Path(__file__).resolve().parents[1] / "v6"
 SCRIPT = V6 / "parts" / "silicone-tube.py"
-BORE = 5.0
 SLEEVE_BORE = 6.4
 MIN_VOLUME = check_overlaps.DEFAULT_MIN_VOLUME
 
 
 def read_routes():
-    """Return {name: script parameters} from the `tubes` list in partcad.yaml."""
+    """Return {part name: script parameters} from the `tubes` list in partcad.yaml."""
     text = (V6 / "partcad.yaml").read_text(encoding="utf-8")
     rows = ast.literal_eval(re.search(r"\{% set tubes = (\[.*?\]) %\}", text, re.S).group(1))
     return {
-        name: dict(tube_od=float(od), points=points, start_sleeve=float(start), end_sleeve=float(end))
-        for name, _part_id, od, start, end, points in rows
+        name: dict(tube_od=float(od), tube_id=float(inner), points=points,
+                   start_sleeve=float(start), end_sleeve=float(end))
+        for name, _part_id, od, inner, start, end, points in rows
     }
 
 
@@ -95,7 +95,7 @@ def tightest_bend(spline):
 def outer_radius(params):
     radius = params["tube_od"] / 2
     if params["start_sleeve"] or params["end_sleeve"]:
-        radius += (SLEEVE_BORE - BORE) / 2
+        radius += (SLEEVE_BORE - params["tube_id"]) / 2
     return radius
 
 

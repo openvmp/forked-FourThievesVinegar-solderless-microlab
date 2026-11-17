@@ -1,4 +1,4 @@
-"""Silicone tube along a route (TC-ST7 7 x 5 mm, SP-STB 8 x 5 mm).
+"""Silicone tube or cable along a route (TC-ST7 7 x 5 mm, SP-STB 8 x 5 mm, RU-TMP cable).
 
 APPROXIMATION: the tubes are flexible and cut by hand, so they have no fixed
 shape. Each route is drawn for the layout in microlab.assy, in that assembly's
@@ -10,6 +10,7 @@ frame, and has to be redrawn when a unit moves.
 - start_sleeve, end_sleeve: length over which the tube is stretched onto
   something wider than its bore, such as the 6.35 mm copper tube.
   sleeve_id is the stretched bore; the wall keeps its thickness.
+- tube_id 0 gives a solid cable.
 """
 
 import cadquery as cq
@@ -33,10 +34,11 @@ def sweep(edge, outer, inner):
     t = edge.tangentAt(0)
     side = cq.Vector(0, 0, 1) if abs(t.z) < 0.9 else cq.Vector(1, 0, 0)
     plane = cq.Plane(origin=p, xDir=t.cross(side).normalized(), normal=t)
+    profile = cq.Workplane(plane).circle(outer / 2)
+    if inner > 0:
+        profile = profile.circle(inner / 2)
     return (
-        cq.Workplane(plane)
-        .circle(outer / 2)
-        .circle(inner / 2)
+        profile
         .sweep(cq.Workplane(obj=cq.Wire.assembleEdges([edge])))
         .val()
     )
