@@ -82,6 +82,7 @@ Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_
 - The stir rod mount's left and right screw holes sit about 0.7 mm off the manifold core's, so those two screws cut the core's hole walls (3.6 and 4.1 mm³). The mount is placed by its back hole, which lines up. The fix belongs in the parts repo's STEP files.
 - The circulation tubes end 45 mm below the manifold lid's top. Straight down from the lid's holes they would meet the inner jar's band, so "a couple inches below the liquid's surface" is not modelled.
 - The stir rod mount's screw holes are 3.0 mm across, the same as the M3 thread (the lid's and core's are 3.2 mm), so each of its three screws overlaps it by 3.7 to 4.0 mm³ along the thread. The fix belongs in the parts repo's STEP file.
+- The inner jar (`parts/mason-jar-6oz-regular-mouth.py`) is a shaped approximation that keeps the earlier model's 81 mm height; the parts list names no jar, and Ball's quilted half-pint (6 oz to the neck) is about 98 x 70 mm. Its 61 mm finish and thread fit the inner band (`mason-jar-band-regular-mouth.py`), which is smaller than a real 70 mm regular-mouth band, so the manifold core's 66 mm disc sits on top of the band instead of inside it. The jar's thread is phased to the band's for their current ports; `thread_start` in the script says how to measure it again.
 - `hot-unit-heater` is a single solid of about 1300 faces. Exact booleans against it can take minutes; screen with plane sections first.
 
 ## Conventions
