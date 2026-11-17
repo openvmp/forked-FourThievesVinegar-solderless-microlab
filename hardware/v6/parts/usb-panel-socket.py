@@ -9,6 +9,9 @@ Where the values come from:
   measured from its STEP.
 - Flange 38 x 11.8 x 4 mm and a 12 mm cable boot are guessed from the photos.
   The cable itself is left out.
+- USB-A receptacle (docs/media/control-unit/cu_case_side.jpeg): a 12.5 x
+  5.12 mm opening, the standard receptacle size, 12.5 mm deep. Its tongue and
+  contacts are left out.
 """
 import cadquery as cq
 
@@ -42,5 +45,14 @@ for x in (-hole_spacing / 2, hole_spacing / 2):
     flange = flange.cut(hole)
 part = part.union(flange)
 part = part.union(block(-7.0, 7.0, -16.0, -4.0, -4.0, 4.0))
+
+receptacle_width = 12.5
+receptacle_height = 5.12
+receptacle_depth = 12.5
+part = part.cut(block(
+    -receptacle_width / 2, receptacle_width / 2,
+    wall - receptacle_depth, wall + 0.1,
+    -receptacle_height / 2, receptacle_height / 2,
+))
 
 show_object(part)
