@@ -9,9 +9,15 @@ Where the values come from:
   measured from its STEP.
 - Flange 38 x 11.8 x 4 mm and a 12 mm cable boot are guessed from the photos.
   The cable itself is left out.
-- USB-A receptacle (docs/media/control-unit/cu_case_side.jpeg): a 12.5 x
-  5.12 mm opening, the standard receptacle size, 12.5 mm deep. Its tongue and
-  contacts are left out.
+- USB-A receptacle (docs/media/control-unit/cu_case_side.jpeg), sizes from
+  the dimensions table of https://en.wikipedia.org/wiki/USB_hardware:
+  opening 12.5 x 5.12 mm, 8.88 mm deep. Its plastic tongue sits "above the
+  center", the "plastic rectangle at the top" of
+  docs/assembly-control-unit.md. The tongue (11 x 1.85 mm, ending 1 mm inside
+  the opening) is sized to fit inside a 12.0 x 4.5 mm plug shell with
+  0.3 mm walls; it is derived, not sourced.
+- Four contacts on the tongue's underside, 1 mm wide at x = -3.5, -1.0, 1.0
+  and 3.5 mm: positions recalled from the USB-A layout, NOT verified.
 """
 import cadquery as cq
 
@@ -48,11 +54,30 @@ part = part.union(block(-7.0, 7.0, -16.0, -4.0, -4.0, 4.0))
 
 receptacle_width = 12.5
 receptacle_height = 5.12
-receptacle_depth = 12.5
+receptacle_depth = 8.88
+tongue_width = 11.0
+tongue_bottom = 0.0
+tongue_top = 1.85
+tongue_recess = 1.0
+contact_width = 1.0
+contact_thickness = 0.15
+
+back = wall - receptacle_depth
 part = part.cut(block(
     -receptacle_width / 2, receptacle_width / 2,
-    wall - receptacle_depth, wall + 0.1,
+    back, wall + 0.1,
     -receptacle_height / 2, receptacle_height / 2,
 ))
+part = part.union(block(
+    -tongue_width / 2, tongue_width / 2,
+    back, wall - tongue_recess,
+    tongue_bottom, tongue_top,
+))
+for x in (-3.5, -1.0, 1.0, 3.5):  # contact centres
+    part = part.union(block(
+        x - contact_width / 2, x + contact_width / 2,
+        back + 1.0, wall - tongue_recess - 0.3,
+        tongue_bottom - contact_thickness, tongue_bottom,
+    ))
 
 show_object(part)
