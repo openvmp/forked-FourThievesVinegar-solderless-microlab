@@ -122,6 +122,20 @@ interfaces:
       m{{ size }}-threaded-shaft: jar-top
   {% endfor %}
 
+  usb-a-receptacle:
+    desc: USB-A receptacle
+    ports:
+      usb-a:
+        location: [[0, 0, 0], [0, 0, 1], 0]
+
+  usb-a-plug:
+    desc: USB-A plug
+    ports:
+      usb-a:
+        location: [[0, 0, 0], [0, 0, 1], 0]
+    mates:
+      - usb-a-receptacle
+
 parts:
   # Control Unit
   control-box:
@@ -659,6 +673,12 @@ parts:
       end_sleeve:
         type: float
         default: {{ end_sleeve }}
+    {% if name == 'thermistor-cable' %}
+    # Probe at the route's start; dongle at the lower USB socket's window.
+    ports:
+      probe: [[{{ points.split(';')[0] }}], [0, 0, 1], 0]
+      dongle: [[86.5, 188, 21], [0, 0, 1], 0]
+    {% endif %}
   {% endfor %}
   thermistor-probe:
     # TODO: add a purchase definition (RU-TMP)
@@ -666,17 +686,28 @@ parts:
     type: cadquery
     path: parts/thermistor-probe.py
     manufacturable: false
+    ports:
+      cable: [[0, 0, 0], [-0.71, -0.71, 0], 180]
   thermistor-dongle:
     # TODO: add a purchase definition (RX-TMPD)
     desc: USB dongle of the thermistor (approximation, see script)
     type: cadquery
     path: parts/thermistor-dongle.py
     manufacturable: false
+    ports:
+      cable: [[0, 0, 0], [-0.71, -0.71, 0], 180]
 
 assemblies:
   microlab:
     type: assy
     path: microlab.assy
+  thermistor:
+    desc: Thermistor probe, cable and USB dongle, in the microlab frame
+    type: assy
+    path: thermistor.assy
+    implements:
+      "usb-a-plug":
+        plug: [[86.5, 188, 21], [-0.71, -0.71, 0], 180]
   control-unit:
     type: assy
     path: control-unit.assy
@@ -694,6 +725,11 @@ assemblies:
     render:
       svg:
         viewportOrigin: [75, 0, 150]
+    implements:
+      # Socket windows of the flat profile; the regular box's differ.
+      "usb-a-receptacle":
+        usb-upper: [[86.5, 188, 33], [0, 0, 1], 0]
+        usb-lower: [[86.5, 188, 21], [0, 0, 1], 0]
   reactor-unit-pumps-box:
     type: assy
     path: reactor-unit-pumps-box.assy

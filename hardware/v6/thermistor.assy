@@ -1,0 +1,15 @@
+links:
+  - part: thermistor-cable
+    name: cable
+  - part: thermistor-probe
+    name: probe
+    connectPorts:
+      with: cable
+      name: cable
+      to: probe
+  - part: thermistor-dongle
+    name: dongle
+    connectPorts:
+      with: cable
+      name: cable
+      to: dongle
