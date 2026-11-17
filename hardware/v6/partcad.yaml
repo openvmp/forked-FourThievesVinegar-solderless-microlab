@@ -19,6 +19,15 @@ docs:
 {% set url = url_prefix + '/v6' %}
 
 {% set sizes = [46, 60, 74, 80] %}
+
+{# Where the thermistor meets the rest, in the microlab frame. The thermistor
+   cable's route and the ports that join it all use these; see AGENTS.md,
+   "Routed parts". #}
+{% set probe_top = [398, 141.2, 123] %}
+{% set usb_upper = [86.5, 188, 33] %}
+{% set usb_lower = [86.5, 188, 21] %}
+{% set dongle_length = 40.1 %}
+{% macro xyz(p, dx=0, dy=0, dz=0) %}{{ (p[0] + dx) | round(2) }},{{ (p[1] + dy) | round(2) }},{{ (p[2] + dz) | round(2) }}{% endmacro %}
 {% set sketch_sizes = [3, 6, 13, 45, 46, 59, 60, 73, 74, 79, 80] %}
 
 # A boundary sketch is "m<size>-boundary": a name is one object of a package,
@@ -648,7 +657,9 @@ parts:
     ["tube-reagent-pump-x", "SP-STB", 8, 5, 0, 0, "309.4,173,223.5; 302,173,214; 293,169,200; 300,154,189; 330,138,196; 352,130,212; 371,121.5,220; 385,114.5,204; 385,114.5,112"],
     ["tube-reagent-pump-y", "SP-STB", 8, 5, 0, 0, "371.9,173,223.5; 364.5,173,214; 362,173,206.6; 365.5,172.5,198.1; 374,172,194.6; 386,172,197; 394.5,168.5,201; 398,158.1,205; 398,148.1,205; 398,138.9,201.2; 398,135.1,192; 398,135.1,124"],
     ["tube-reagent-pump-z", "SP-STB", 8, 5, 0, 0, "434.4,173,223.5; 427,173,214; 424.5,173,206.6; 428,172.5,198.1; 436.5,172,194.6; 444,168.5,197; 446.9,160,200; 446,145,206; 440,133,211; 431.6,126.9,213; 421.3,120.7,213; 414,116.3,209.5; 411,114.5,201; 411,114.5,112"],
-    ["thermistor-cable", "RU-TMP", 3.5, 0, 0, 0, "398,141.2,123; 398,141.2,181; 398,143.5,187; 398,151,189.5; 391,161,189.5; 362,163,188.5; 325,163,180; 302,163,173; 293,163,155; 292,163,50; 291,164,22; 287,165.5,8; 279,168,3; 268,171.5,2.1; 240,181,2.1; 195,198,2.1; 150,232,2.1; 118,252,2.1; 100,256,5; 90,252,13; 86.5,244,19.5; 86.5,236,21; 86.5,228.1,21"],
+    ["thermistor-cable", "RU-TMP", 3.5, 0, 0, 0,
+      xyz(probe_top) ~ "; " ~ xyz(probe_top, dz=58) ~ "; 398,143.5,187; 398,151,189.5; 391,161,189.5; 362,163,188.5; 325,163,180; 302,163,173; 293,163,155; 292,163,50; 291,164,22; 287,165.5,8; 279,168,3; 268,171.5,2.1; 240,181,2.1; 195,198,2.1; 150,232,2.1; 118,252,2.1; 100,256,5; 90,252,13; 86.5,244,19.5; "
+      ~ xyz(usb_lower, dy=dongle_length + 7.9) ~ "; " ~ xyz(usb_lower, dy=dongle_length)],
   ] %}
   {% for name, part_id, od, inner, start_sleeve, end_sleeve, points in tubes %}
   {{ name }}:
@@ -676,8 +687,8 @@ parts:
     {% if name == 'thermistor-cable' %}
     # Probe at the route's start; dongle at the lower USB socket's window.
     ports:
-      probe: [[{{ points.split(';')[0] }}], [0, 0, 1], 0]
-      dongle: [[86.5, 188, 21], [0, 0, 1], 0]
+      probe: [[{{ xyz(probe_top) }}], [0, 0, 1], 0]
+      dongle: [[{{ xyz(usb_lower) }}], [0, 0, 1], 0]
     {% endif %}
   {% endfor %}
   thermistor-probe:
@@ -707,7 +718,7 @@ assemblies:
     path: thermistor.assy
     implements:
       "usb-a-plug":
-        plug: [[86.5, 188, 21], [-0.71, -0.71, 0], 180]
+        plug: [[{{ xyz(usb_lower) }}], [-0.71, -0.71, 0], 180]
   control-unit:
     type: assy
     path: control-unit.assy
@@ -728,8 +739,8 @@ assemblies:
     implements:
       # Socket windows of the flat profile; the regular box's differ.
       "usb-a-receptacle":
-        usb-upper: [[86.5, 188, 33], [0, 0, 1], 0]
-        usb-lower: [[86.5, 188, 21], [0, 0, 1], 0]
+        usb-upper: [[{{ xyz(usb_upper) }}], [0, 0, 1], 0]
+        usb-lower: [[{{ xyz(usb_lower) }}], [0, 0, 1], 0]
   reactor-unit-pumps-box:
     type: assy
     path: reactor-unit-pumps-box.assy

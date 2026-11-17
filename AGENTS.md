@@ -43,12 +43,24 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 
 ## Tubes
 
-The routes of the `tube-*` parts and the `thermistor-cable` are the `tubes` list in `hardware/v6/partcad.yaml`: part name, parts list ID, outer and inner diameter (0 for a solid cable), sleeve lengths, points. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery):
+The routes of the `tube-*` parts and the `thermistor-cable` are the `tubes` list in `hardware/v6/partcad.yaml`: part name, parts list ID, outer and inner diameter (0 for a solid cable), sleeve lengths, points. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery, jinja2 and PyYAML; it renders `partcad.yaml` as PartCAD does):
 
 1. With no arguments: each tube's length, tightest bend and gaps to the other tubes, in seconds. Do this after every route edit. Keep bends at or above the tube's diameter.
 2. `--step <microlab export> --cache <dir>`: exact overlaps with the parts near each tube's path. `--move 1/2=dx,dy,dz` tries a new unit position without another export. An overlap with a peristaltic pump takes about 8 minutes to measure, so run tubes in separate processes with `--only`.
 
 Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_features.py` lists a STEP file's cylinders and faces, to find nozzles and holes.
+
+## Routed parts
+
+Tubes and the thermistor cable are routed parts: solids swept along a list of points (`parts/silicone-tube.py`), drawn in the `microlab` frame. PartCAD has no part type whose shape follows two connected ports: every part is built in its own frame before it is placed. So a routed part is rigid, and moving either end means redrawing its route.
+
+Decision (2026-11-18): where a route ends at a port, the end point is a Jinja variable at the top of `hardware/v6/partcad.yaml`, used by the route and by every port at that point. Those are `probe_top`, `usb_upper`, `usb_lower` and `dongle_length`, with the macro `xyz(point, dx, dy, dz)` writing them out. Moving an end means editing one variable; the waypoints in between are still written by hand and checked with `check_tubes.py`. The tubes' ends are still literal points, because none of them ends at a port yet.
+
+Other options:
+
+1. Not taken: the route as `params:` on its `.assy` link. It would sit next to the parts it joins, but still be written by hand, and `check_tubes.py` reads only the defaults in `partcad.yaml`.
+2. Follow-up: a routing tool in `hardware/tools/`. It would read an export, find the two ports a route joins, draw a route between them that keeps clear of nearby parts (with `check_tubes.py`'s checks), and write the points back into `partcad.yaml`. It would cover all the tubes, so moving a unit means re-running it.
+3. Follow-up, upstream: a routed part type in PartCAD, built after placement from two connected ports (a second build pass). Only this would let a cable follow both of its ends. It belongs in PartCAD as a feature request.
 
 ## Sweeps
 
