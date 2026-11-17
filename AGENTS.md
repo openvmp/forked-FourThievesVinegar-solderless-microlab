@@ -43,12 +43,24 @@ The STEP export loses instance names. Parts are listed by tree path (e.g. `1/3/1
 
 ## Tubes
 
-The routes of the `tube-*` parts are the `tubes` list in `hardware/v6/partcad.yaml`. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery):
+The routes of the `tube-*` parts and the `thermistor-cable` are the `tubes` list in `hardware/v6/partcad.yaml`: part name, parts list ID, outer and inner diameter (0 for a solid cable), sleeve lengths, points. Check them with `hardware/tools/check_tubes.py` (needs a Python with CadQuery, jinja2 and PyYAML; it renders `partcad.yaml` as PartCAD does):
 
 1. With no arguments: each tube's length, tightest bend and gaps to the other tubes, in seconds. Do this after every route edit. Keep bends at or above the tube's diameter.
 2. `--step <microlab export> --cache <dir>`: exact overlaps with the parts near each tube's path. `--move 1/2=dx,dy,dz` tries a new unit position without another export. An overlap with a peristaltic pump takes about 8 minutes to measure, so run tubes in separate processes with `--only`.
 
 Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_features.py` lists a STEP file's cylinders and faces, to find nozzles and holes.
+
+## Routed parts
+
+Tubes and the thermistor cable are routed parts: solids swept along a list of points (`parts/silicone-tube.py`), drawn in the `microlab` frame. PartCAD has no part type whose shape follows two connected ports: every part is built in its own frame before it is placed. So a routed part is rigid, and moving either end means redrawing its route.
+
+Decision (2026-11-18): where a route ends at a port, the end point is a Jinja variable at the top of `hardware/v6/partcad.yaml`, used by the route and by every port at that point. Those are `probe_top`, `usb_upper`, `usb_lower` and `dongle_length`, with the macro `xyz(point, dx, dy, dz)` writing them out. Moving an end means editing one variable; the waypoints in between are still written by hand and checked with `check_tubes.py`. The tubes' ends are still literal points, because none of them ends at a port yet.
+
+Other options:
+
+1. Not taken: the route as `params:` on its `.assy` link. It would sit next to the parts it joins, but still be written by hand, and `check_tubes.py` reads only the defaults in `partcad.yaml`.
+2. Follow-up: a routing tool in `hardware/tools/`. It would read an export, find the two ports a route joins, draw a route between them that keeps clear of nearby parts (with `check_tubes.py`'s checks), and write the points back into `partcad.yaml`. It would cover all the tubes, so moving a unit means re-running it.
+3. Follow-up, upstream: a routed part type in PartCAD, built after placement from two connected ports (a second build pass). Only this would let a cable follow both of its ends. Proposed upstream as partcad/partcad#975.
 
 ## Sweeps
 
@@ -77,10 +89,12 @@ Lay turns out on arcs: waypoints placed by eye give kinks. `hardware/tools/step_
 - The docs screw the converter case to the flat box's floor, but the box has no hole there, so the case rests unscrewed. The lever connector's two screws are left out: 12 mm M3 screws through its (guessed) 3 mm ears would come out under the floor.
 - `cold-unit-tube` and `hot-unit-tube` are CadQuery approximations of the hand-bent coils; their scripts say where each value comes from.
 - The `tube-*` parts (`parts/silicone-tube.py`) are approximations of flexible tubing. Each route is a list of points in the `microlab` assembly's frame, drawn for the unit positions in `microlab.assy`; moving a unit means redrawing its tubes. The circulation tubes match the docs' 16 in and 8 in lengths. The reagent tubes' lengths are guessed, and they butt against the peristaltic pump model's own tube stubs with no connector.
+- The thermistor (assembly `thermistor`: `thermistor-probe`, `thermistor-cable`, `thermistor-dongle`) is an approximation. The cable is the assembly's root and is drawn in the microlab frame; the probe and dongle hang off its ports. The assembly implements `usb-a-plug` and plugs into the `control-unit` assembly's `usb-lower` (`usb-a-receptacle`). Those receptacle ports hold for the flat profile only, and moving either unit means redrawing the cable; the parts list names no model. The probe is a 6 x 50 mm sleeve, the cable 3.5 mm, the dongle 18 x 9 x 40 mm, all guessed from typical USB DS18B20 listings. Only the manifold core's holes reach the inner jar, so the cable shares the back hole with `tube-reagent-pump-y`: 8 mm tube, 3.5 mm cable and 0.3 mm between them in the 12 mm hole. A 4 mm cable would not fit. That tube ends at the core's underside so the sleeve can hang beside it, tip 6.6 mm above the stir paddle's blades. The dongle is the blue USB-A stick of `docs/media/ML_case_cabled.jpeg`, its body sized from that photo; its plug sits in the lower socket's USB-A receptacle. Opening (12.5 x 5.12 x 8.88 mm) and plug shell (12.0 x 4.5 mm) are from Wikipedia's USB hardware dimensions table; the receptacle's tongue and the plug's insert are derived to fit them, and the four contact positions are unverified.
 - The circulation pump model's two nozzles sit front and back. The docs and the photo `docs/media/pumps-unit/pumps-unit-complete-rear.jpg` have them top and bottom. Turning the model would push its ears through the box's front wall, so the model is at fault. The front nozzle goes to the manifold, the back one to the coil.
 - The stir rod mount's left and right screw holes sit about 0.7 mm off the manifold core's, so those two screws cut the core's hole walls (3.6 and 4.1 mm³). The mount is placed by its back hole, which lines up. The fix belongs in the parts repo's STEP files.
 - The circulation tubes end 45 mm below the manifold lid's top. Straight down from the lid's holes they would meet the inner jar's band, so "a couple inches below the liquid's surface" is not modelled.
 - The stir rod mount's screw holes are 3.0 mm across, the same as the M3 thread (the lid's and core's are 3.2 mm), so each of its three screws overlaps it by 3.7 to 4.0 mm³ along the thread. The fix belongs in the parts repo's STEP file.
+- The inner jar (`parts/mason-jar-6oz-regular-mouth.py`) is a shaped approximation that keeps the earlier model's 81 mm height; the parts list names no jar, and Ball's quilted half-pint (6 oz to the neck) is about 98 x 70 mm. Its 61 mm finish and thread fit the inner band (`mason-jar-band-regular-mouth.py`), which is smaller than a real 70 mm regular-mouth band, so the manifold core's 66 mm disc sits on top of the band instead of inside it. The jar's thread is phased to the band's for their current ports; `thread_start` in the script says how to measure it again.
 - `hot-unit-heater` is a single solid of about 1300 faces. Exact booleans against it can take minutes; screen with plane sections first.
 
 ## Conventions

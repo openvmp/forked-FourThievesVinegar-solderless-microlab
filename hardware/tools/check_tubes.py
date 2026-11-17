@@ -1,7 +1,10 @@
-"""Check the routes of the tube-* parts: length, bends, gaps and overlaps.
+"""Check the routed parts (tubes, thermistor cable): length, bends, gaps, overlaps.
 
-The routes are read from the `tubes` list in hardware/v6/partcad.yaml, so edit
-them there and run this again. Needs a Python with CadQuery.
+The routes are the parameters of every part built by parts/silicone-tube.py,
+read from hardware/v6/partcad.yaml after rendering its Jinja the way PartCAD
+does, so variables in a route (the thermistor cable's ends) are filled in.
+Edit them there and run this again. Needs a Python with CadQuery, jinja2 and
+PyYAML.
 
     python hardware/tools/check_tubes.py
         Length, tightest bend and tube-to-tube gaps. Takes seconds.
@@ -16,7 +19,7 @@ them there and run this again. Needs a Python with CadQuery.
         Shift the parts under a tree path first, to try a new unit position
         without exporting again.
 
-    ... --only heat-pump-to-coil
+    ... --only tube-heat-pump-to-coil
         Check some tubes only. An overlap with a peristaltic pump takes about
         8 minutes to measure, so run tubes in separate processes.
 
@@ -25,14 +28,14 @@ tubes of the previous export and are skipped; --skip adds more.
 """
 
 import argparse
-import ast
 import itertools
-import re
 import sys
 import time
 from pathlib import Path
 
 import cadquery as cq
+import jinja2
+import yaml
 from cadquery import cqgi
 from OCP.BRep import BRep_Builder
 from OCP.BRepAdaptor import BRepAdaptor_Curve
@@ -47,19 +50,33 @@ import check_overlaps  # noqa: E402
 
 V6 = Path(__file__).resolve().parents[1] / "v6"
 SCRIPT = V6 / "parts" / "silicone-tube.py"
-BORE = 5.0
 SLEEVE_BORE = 6.4
 MIN_VOLUME = check_overlaps.DEFAULT_MIN_VOLUME
 
 
 def read_routes():
-    """Return {name: script parameters} from the `tubes` list in partcad.yaml."""
-    text = (V6 / "partcad.yaml").read_text(encoding="utf-8")
-    rows = ast.literal_eval(re.search(r"\{% set tubes = (\[.*?\]) %\}", text, re.S).group(1))
-    return {
-        name: dict(tube_od=float(od), points=points, start_sleeve=float(start), end_sleeve=float(end))
-        for name, _part_id, od, start, end, points in rows
-    }
+    """Return {part name: script parameters} for every part built by SCRIPT.
+
+    partcad.yaml is rendered as PartCAD renders it: its own folder first, then
+    its includePaths (the root package passes ".." for hardware/urls.j2).
+    Only parameter defaults are read; a route given as `params:` on an .assy
+    link would not be seen.
+    """
+    loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(str(V6)), jinja2.FileSystemLoader(str(V6.parent))])
+    env = jinja2.Environment(loader=loader, undefined=jinja2.StrictUndefined)
+    text = env.from_string((V6 / "partcad.yaml").read_text(encoding="utf-8")).render()
+    parts = yaml.safe_load(text)["parts"]
+    script = "parts/" + SCRIPT.name
+    routes = {}
+    for name, part in parts.items():
+        if part.get("path") != script:
+            continue
+        values = {key: spec["default"] for key, spec in part["parameters"].items()}
+        routes[name] = dict(
+            tube_od=float(values["tube_od"]), tube_id=float(values["tube_id"]), points=str(values["points"]),
+            start_sleeve=float(values["start_sleeve"]), end_sleeve=float(values["end_sleeve"]),
+        )
+    return routes
 
 
 def centreline(points):
@@ -95,7 +112,7 @@ def tightest_bend(spline):
 def outer_radius(params):
     radius = params["tube_od"] / 2
     if params["start_sleeve"] or params["end_sleeve"]:
-        radius += (SLEEVE_BORE - BORE) / 2
+        radius += (SLEEVE_BORE - params["tube_id"]) / 2
     return radius
 
 

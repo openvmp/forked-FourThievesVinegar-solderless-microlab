@@ -22,3 +22,10 @@ links:
   - part: tube-reagent-pump-{{ pump }}
     name: tube-reagent-pump-{{ pump }}
   {% endfor %}
+
+  - assembly: thermistor
+    name: thermistor
+    connect:
+      withInstance: plug
+      toInstance: usb-lower
+      name: control-unit
